@@ -6,7 +6,26 @@
 # =========================================================================
 
 ---
+# =========================================================================
+#   Ceedling - Test-Centered Build System for C
+#   ThrowTheSwitch.org
+#   Copyright (c) 2010-24 Mike Karlesky, Mark VanderVoord, & Greg Williams
+#   SPDX-License-Identifier: MIT
+# =========================================================================
+
+---
 :project:
+  # how to use ceedling. If you're not sure, leave this as `gem` and `?`
+  :which_ceedling: gem
+  :ceedling_version: 1.0.0
+
+  # optional features. If you don't need them, keep them turned off for performance
+  :use_mocks: TRUE
+  :use_test_preprocessor: :none
+  :use_backtrace: :simple
+  :use_decorators: :auto #Decorate Ceedling's output text. Your options are :auto, :all, or :none
+
+  # tweak the way ceedling handles automatic tasks
   # how to use ceedling. If you're not sure, leave this as `gem` and `?`
   :which_ceedling: gem
   :ceedling_version: 1.0.0
@@ -96,11 +115,21 @@
   #:assembly: .s
   #:dependencies: .d
   #:object: .o
+  #:header: .h
+  #:source: .c
+  #:assembly: .s
+  #:dependencies: .d
+  #:object: .o
   :executable: .out
   #:testpass: .pass
   #:testfail: .fail
   #:subprojects: .a
+  #:testpass: .pass
+  #:testfail: .fail
+  #:subprojects: .a
 
+# This is where Ceedling should look for your source and test files.
+# see documentation for the many options for specifying this.
 # This is where Ceedling should look for your source and test files.
 # see documentation for the many options for specifying this.
 :paths:
@@ -111,10 +140,24 @@
     - src/**
   :include:
     - src/** # In simple projects, this entry often duplicates :source
+  :include:
+    - src/** # In simple projects, this entry often duplicates :source
   :support:
     - test/support
   :libraries: []
 
+# You can even specify specific files to add or remove from your test
+# and release collections. Usually it's better to use paths and let
+# Ceedling do the work for you!
+:files:
+  :test: []
+  :source: []
+
+# Compilation symbols to be injected into builds
+# See documentation for advanced options:
+#  - Test name matchers for different symbols per test executable build
+#  - Referencing symbols in multiple lists using advanced YAML
+#  - Specifiying symbols used during test preprocessing
 # You can even specify specific files to add or remove from your test
 # and release collections. Usually it's better to use paths and let
 # Ceedling do the work for you!
@@ -149,7 +192,29 @@
 #         - -foo
 
 # Configuration Options specific to CMock. See CMock docs for details
+    - TEST # Simple list option to add symbol 'TEST' to compilation of all files in all test executables
+  :release: []
+
+  # Enable to inject name of a test as a unique compilation symbol into its respective executable build. 
+  :use_test_definition: FALSE 
+
+# Configure additional command line flags provided to tools used in each build step
+# :flags:
+#   :release:
+#     :compile:         # Add '-Wall' and '--02' to compilation of all files in release target
+#       - -Wall
+#       - --O2
+#   :test:
+#     :compile:
+#       '(_|-)special': # Add '-pedantic' to compilation of all files in all test executables with '_special' or '-special' in their names
+#         - -pedantic
+#       '*':            # Add '-foo' to compilation of all files in all test executables
+#         - -foo
+
+# Configuration Options specific to CMock. See CMock docs for details
 :cmock:
+  # Core conffiguration
+  :plugins:                        # What plugins should be used by CMock?
   # Core conffiguration
   :plugins:                        # What plugins should be used by CMock?
     - :ignore
@@ -187,6 +252,41 @@
     uint32:   UINT32
     int8:     INT8
     bool:     UINT8
+  #:treat_as_array:  {}            # hint to cmock that these types are pointers to something
+  #:treat_as_void:  []             # hint to cmock that these types are actually aliases of void
+  :memcmp_if_unknown:  true        # allow cmock to use the memory comparison assertions for unknown types
+  :when_ptr:  :compare_data        # hint to cmock how to handle pointers in general, the options being :compare_ptr, :compare_data, or :smart
+
+  # Mock generation configuration
+  :weak:  ''                       # Symbol to use to declare weak functions
+  :enforce_strict_ordering: true   # Do we want cmock to enforce ordering of all function calls?
+  :fail_on_unexpected_calls: true  # Do we want cmock to fail when it encounters a function call that wasn't expected?
+  :callback_include_count: true    # Do we want cmock to include the number of calls to this callback, when using callbacks?
+  :callback_after_arg_check: false # Do we want cmock to enforce an argument check first when using a callback?
+  #:includes: []                   # You can add additional includes here, or specify the location with the options below
+  #:includes_h_pre_orig_header: [] 
+  #:includes_h_post_orig_header: []
+  #:includes_c_pre_header:  []
+  #:includes_c_post_header:  []
+  #:array_size_type:  []            # Specify a type or types that should be used for array lengths
+  #:array_size_name:  'size|len'    # Specify a name or names that CMock might automatically recognize as the length of an array
+  :exclude_setjmp_h:  false        # Don't use setjmp when running CMock. Note that this might result in late reporting or out-of-order failures.
+
+# Configuration options specific to Unity. 
+:unity:
+  :defines:
+    - UNITY_EXCLUDE_FLOAT
+
+# You can optionally have ceedling create environment variables for you before
+# performing the rest of its tasks.
+:environment: []
+# :environment:
+#   # List enforces order allowing later to reference earlier with inline Ruby substitution
+#   - :var1: value
+#   - :var2: another value
+#   - :path:            # Special PATH handling with platform-specific path separators
+#     - #{ENV['PATH']}  # Environment variables can use inline Ruby substitution
+#     - /another/path/to/include
   #:treat_as_array:  {}            # hint to cmock that these types are pointers to something
   #:treat_as_void:  []             # hint to cmock that these types are actually aliases of void
   :memcmp_if_unknown:  true        # allow cmock to use the memory comparison assertions for unknown types
