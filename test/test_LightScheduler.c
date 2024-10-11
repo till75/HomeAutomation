@@ -20,20 +20,16 @@ static void testLightStatus(int id, int level)
 
 void setUp(void)
 {
-    /*
     LightController_Create();
     LightScheduler_Create();
-    */
 }
 
 void tearDown(void)
 {
-    /*
     LightScheduler_Destroy();
     LightController_Destroy();
-    */
 }
-/* 
+
 void test_LightScheduler_NoChangeToLightsDuringInitialization(void)
 {
     TEST_ASSERT_EQUAL(LIGHT_ID_UNKNOWN, LightControllerSpy_GetLastId());
@@ -145,28 +141,28 @@ void test_LightScheduler_ScheduleWeekdayAndItsFriday(void)
     LightScheduler_WakeUp();
     testLightStatus(3, LIGHT_ON);    
 }
-*/
+
 
 /////////////////////////////////////////////////////////
 // "Test the Wiring" - requires that setUp() is empty!
 /////////////////////////////////////////////////////////
 
-void test_LightScheduler_CreateStartsOneMinuteAlarm(void)
-{
-    LightScheduler_Create();
-    TEST_ASSERT_EQUAL_PTR(  (void*)LightScheduler_WakeUp,
-                            (void*)FakeTimeService_GetAlarmCallback()
-                          );
-    TEST_ASSERT_EQUAL(60, FakeTimeService_GetAlarmPeriod());
-    LightScheduler_Destroy();
-}
+// void test_LightScheduler_CreateStartsOneMinuteAlarm(void)
+// {
+//     LightScheduler_Create();
+//     TEST_ASSERT_EQUAL_PTR(  (void*)LightScheduler_WakeUp,
+//                             (void*)FakeTimeService_GetAlarmCallback()
+//                           );
+//     TEST_ASSERT_EQUAL(60, FakeTimeService_GetAlarmPeriod());
+//     LightScheduler_Destroy();
+// }
 
-void test_LightScheduler_DestroyCancelsOneMinuteAlarm(void)
-{
-    LightScheduler_Create();
-    LightScheduler_Destroy();
-    TEST_ASSERT_EQUAL_PTR(NULL, (void*)FakeTimeService_GetAlarmCallback());
-}
+// void test_LightScheduler_DestroyCancelsOneMinuteAlarm(void)
+// {
+//     LightScheduler_Create();
+//     LightScheduler_Destroy();
+//     TEST_ASSERT_EQUAL_PTR(NULL, (void*)FakeTimeService_GetAlarmCallback());
+// }
 
 
 #endif // TEST
